@@ -4,7 +4,23 @@ import { ROOM_PREFIX, type ClientMsg, type HostMsg } from './protocol'
 /**
  * Thin wrappers over PeerJS for the two roles. The public PeerServer is used
  * only for signaling; game data flows over the WebRTC data channel directly.
+ *
+ * Players are usually on different home networks (different cities), so offer
+ * several independent STUN servers for NAT traversal. PeerJS's default is a
+ * single Google STUN server; more candidates make cross-network connections
+ * far more reliable. There is no TURN relay — fully blocked networks (some
+ * office/school firewalls) cannot connect and surface a friendly error.
  */
+const ICE_SERVERS: RTCIceServer[] = [
+  { urls: 'stun:stun.l.google.com:19302' },
+  { urls: 'stun:stun1.l.google.com:19302' },
+  { urls: 'stun:stun2.l.google.com:19302' },
+  { urls: 'stun:stun3.l.google.com:19302' },
+  { urls: 'stun:stun.cloudflare.com:3478' },
+  { urls: 'stun:global.stun.twilio.com:3478' },
+]
+
+const PEER_OPTIONS = { config: { iceServers: ICE_SERVERS } }
 
 export type HostHandlers = {
   onWaiting(): void
@@ -21,7 +37,7 @@ export class HostRoom {
 
   start(code: string, h: HostHandlers): void {
     this.close()
-    const peer = new Peer(ROOM_PREFIX + code)
+    const peer = new Peer(ROOM_PREFIX + code, PEER_OPTIONS)
     this.peer = peer
 
     peer.on('open', () => h.onWaiting())
@@ -88,7 +104,7 @@ export class GuestConnection {
 
   join(code: string, h: GuestHandlers): void {
     this.close()
-    const peer = new Peer()
+    const peer = new Peer(PEER_OPTIONS)
     this.peer = peer
 
     peer.on('error', (err) => {
