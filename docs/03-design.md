@@ -1,4 +1,4 @@
-# Visual direction — quiet playfulness
+# Visual direction, quiet playfulness
 
 A warm paper canvas, dark ink, a restrained leafy green accent, and a small apricot companion. Professional means orderly spacing, legible type, and obvious controls. Cute comes from the mascot and short copy, not from decorating every component.
 

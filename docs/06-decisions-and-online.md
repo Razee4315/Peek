@@ -29,3 +29,9 @@ The online build needs a server-authoritative match engine. Server retains both 
 Each guess command needs a match ID, player session identity, request ID for deduplication, and expected turn version. The server validates turn ownership and input and commits the result atomically. It rejects stale/duplicate actions predictably. Reconnection must return the authorized current state instead of replaying UI assumptions.
 
 Future online planning must decide room expiration, private player-session recovery, disconnect grace period, abandoned-match outcome, rate limits, transport, server storage, and deployment. Define online schema and endpoint contracts then. No provider or protocol is locked by these offline docs. Shared-device privacy screens are replaced by remote wait states; the visual system and game rules remain reusable.
+
+## Shipped multiplayer fixes (September 2026)
+
+The shipped implementation uses the host browser as authority, rather than a dedicated server. PeerJS bundled STUN/TURN settings are preserved; a STUN-only override had removed relay support. Initial connection and welcome have a 25-second deadline, cancellation, and stale callback guards. Pending guest connections reserve the second seat and expire if no hello arrives. Closing a room invalidates its callbacks before transport cleanup.
+
+Invite links open name entry directly. Both seats choose a name before play. Online seat views include opponentSecretLocked and opponentGuesses (submitted values and hints only). These fields live in memory and are sent over the encrypted data channel; they are not persisted or logged. Secret values and drafts remain private. Opponent guesses are shown during turns and feedback; local opponent histories remain hidden. Local play must acknowledge its handoff before the next guess.

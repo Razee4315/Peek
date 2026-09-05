@@ -27,7 +27,7 @@ Small Peek wordmark at the top; generous whitespace; mascot; headline **“A lit
 
 ## 2. Private handoff
 
-Full opaque paper background. No number, history, range, feedback, or previous-screen content behind translucency. Small mascot and player color marker. Heading **“Pass to Maya.”** Body **“Only Maya should look next.”** Main button **“I'm Maya — ready”**. Seat label “Player 2” disambiguates identical names. Do not autofocus this button after the prior click; prevent click-through into the next screen.
+Full opaque paper background. No number, history, range, feedback, or previous-screen content behind translucency. Small mascot and player color marker. Heading **“Pass to Maya.”** Body **“Only Maya should look next.”** Main button **“I'm Maya, ready”**. Seat label “Player 2” disambiguates identical names. Do not autofocus this button after the prior click; prevent click-through into the next screen.
 
 ## 3. Secret setup
 

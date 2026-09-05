@@ -13,7 +13,7 @@ export default defineConfig({
       includeAssets: ['brand/logo.svg', 'brand/logo-mono.svg', 'brand/wordmark.svg', 'favicon.svg'],
       manifest: {
         id: '/Peek/',
-        name: 'Peek — a tiny guessing duel',
+        name: 'Peek, a tiny guessing duel',
         short_name: 'Peek',
         description:
           'Two friends pick secret numbers, then race to find each other\u2019s first. Play face to face on one device or online with a room code.',
@@ -38,6 +38,6 @@ export default defineConfig({
   },
   test: {
     environment: 'node',
-    include: ['tests/**/*.test.ts'],
+    include: ['tests/**/*.test.{ts,tsx}'],
   },
 })

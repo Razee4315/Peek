@@ -36,7 +36,7 @@ export function HandoffCover({ recipient, name, destination, onReady }: HandoffC
         </p>
         <h1 className="handoff-title">Pass to {name}.</h1>
         <p className="handoff-body">Only {name} should look next.</p>
-        <Btn onClick={onReady}>I&rsquo;m {name} — {destination === 'secret' ? 'pick my secret' : 'ready'}</Btn>
+        <Btn onClick={onReady}>I&rsquo;m {name}, {destination === 'secret' ? 'pick my secret' : 'ready'}</Btn>
       </div>
     </div>
   )
@@ -49,7 +49,7 @@ export function WelcomeBackCover({ onBack }: { onBack: () => void }) {
       <div className="handoff-inner">
         <Mascot size={72} />
         <h1 className="handoff-title">Welcome back.</h1>
-        <p className="handoff-body">Tap to take another peek — the round is waiting.</p>
+        <p className="handoff-body">Tap to take another peek, the round is waiting.</p>
         <Btn onClick={onBack}>Continue</Btn>
       </div>
     </div>

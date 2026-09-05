@@ -49,7 +49,7 @@ export function cleanName(raw: string | undefined): string | null {
   return name === '' ? null : name
 }
 
-/** Who may submit the next guess: the active player, or — after a wrong guess online — the other seat. */
+/** Who may submit the next guess: the active player, or, after a wrong guess online, the other seat. */
 export function nextActor(s: Session): PlayerId {
   if (s.phase.step === 'guess') return s.activePlayer
   if (s.phase.step === 'feedback') return other(s.activePlayer)
@@ -93,6 +93,7 @@ export function applyCommand(state: Session, cmd: Command): Session {
 
     case 'SUBMIT_GUESS': {
       if (state.phase.step !== 'guess' && state.phase.step !== 'feedback') return state
+      if (state.play === 'local' && state.phase.step === 'feedback') return state
       if (cmd.seat !== nextActor(state)) return state
       const opponent = other(cmd.seat)
       const secret = state.secrets[opponent]
@@ -130,7 +131,7 @@ export function applyCommand(state: Session, cmd: Command): Session {
     }
 
     case 'PASS_DEVICE': {
-      if (state.phase.step !== 'feedback') return state
+      if (state.play !== 'local' || state.phase.step !== 'feedback') return state
       const next = other(state.activePlayer)
       return { ...state, activePlayer: next, phase: { step: 'handoff', recipient: next, destination: 'guess' } }
     }
@@ -203,6 +204,8 @@ export function selectView(s: Session, you: PlayerId): SeatView {
     yourSecret: s.secrets[you],
     yourSecretLocked: s.locked[you],
     yourGuesses: s.guesses[you],
+    opponentGuesses: s.play === 'online' ? s.guesses[opponent] : [],
+    opponentSecretLocked: s.locked[opponent],
     range: s.mode === 'numbers' ? remainingRangeSafe(s.guesses[you]) : null,
     step,
     revealed:

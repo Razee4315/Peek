@@ -52,7 +52,7 @@ export type Command =
   | { type: 'VOTE_REMATCH'; seat: PlayerId }
 
 /**
- * What one seat is allowed to see. The online guest only ever receives this —
+ * What one seat is allowed to see. The online guest only ever receives this ,
  * never the full session, and never the opponent's secret before the result.
  */
 export type ScreenView =
@@ -75,6 +75,9 @@ export interface SeatView {
   yourSecret: SecretValue | null
   yourSecretLocked: boolean
   yourGuesses: Attempt[]
+  /** Online only: submitted attempts, never an unsubmitted secret or draft. */
+  opponentGuesses: Attempt[]
+  opponentSecretLocked: boolean
   /** numbers mode only: inclusive range still possible for your own hunt. */
   range: [number, number] | null
   step: ScreenView

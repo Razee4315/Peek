@@ -3,7 +3,7 @@ import { parseNumber0to100, rangeError, validateSecret } from '../game/validate'
 import type { PlayerId, SeatView, SecretValue } from '../game/types'
 import { other } from '../game/types'
 import { Btn } from './Btn'
-import { History } from './History'
+import { History, hintWord } from './History'
 import { Mascot } from './Mascot'
 import { NumField } from './NumField'
 import { HandoffCover } from './TopBar'
@@ -99,6 +99,7 @@ function SecretEntry({ view, onLock }: { view: SeatView; onLock: (v: SecretValue
             : 'Pick a code of 4 different digits.'}
         </p>
       </div>
+      {view.play === 'online' && <p className="muted" role="status">{view.names[other(you)]}{view.opponentSecretLocked ? " has locked their secret." : " is choosing their secret."}</p>}
       <div className="secret-field">
         <NumField
           label={view.mode === 'numbers' ? 'Your number' : 'Your code'}
@@ -193,6 +194,7 @@ function TurnEntry({ view, onGuess }: { view: SeatView; onGuess: (v: SecretValue
       <Btn onClick={submit} disabled={text === ''}>
         Make guess
       </Btn>
+      <OpponentActivity view={view} />
       <History attempts={view.yourGuesses} mode={view.mode} />
     </div>
   )
@@ -205,6 +207,7 @@ function WaitingTurn({ view }: { view: SeatView }) {
       <Mascot size={80} />
       <h1 className="title">Waiting for {view.names[actor]}…</h1>
       <p className="muted">Their guess is on the way.</p>
+      <OpponentActivity view={view} />
       <History attempts={view.yourGuesses} mode={view.mode} />
     </div>
   )
@@ -260,6 +263,7 @@ function Feedback({ view, onPass }: { view: SeatView; onPass: () => void }) {
       ) : (
         <p className="muted center-text">Turn passes to {view.names[opponent]}.</p>
       )}
+      <OpponentActivity view={view} />
       <History attempts={view.yourGuesses} mode={view.mode} />
     </div>
   )
@@ -326,5 +330,19 @@ function Result({
         </Btn>
       </div>
     </div>
+  )
+}
+
+function OpponentActivity({ view }: { view: SeatView }) {
+  if (view.play !== 'online') return null
+  const attempts = view.opponentGuesses ?? []
+  const last = attempts[attempts.length - 1]
+  if (!last) return null
+  const name = view.names[other(view.you)]
+  return (
+    <section className="opponent-activity" aria-label="Opponent activity">
+      <p role="status"><strong>{name} guessed <span className="num">{last.value}</span>.</strong> {hintWord(last)}</p>
+      <History attempts={attempts} mode={view.mode} label={name + "'s guesses"} />
+    </section>
   )
 }

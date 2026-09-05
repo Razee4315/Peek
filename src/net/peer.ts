@@ -1,27 +1,8 @@
 import Peer, { type DataConnection } from 'peerjs'
 import { ROOM_PREFIX, type ClientMsg, type HostMsg } from './protocol'
 
-/**
- * Thin wrappers over PeerJS for the two roles. The public PeerServer is used
- * only for signaling; game data flows over the WebRTC data channel directly.
- *
- * Players are usually on different home networks (different cities), so offer
- * several independent STUN servers for NAT traversal. PeerJS's default is a
- * single Google STUN server; more candidates make cross-network connections
- * far more reliable. There is no TURN relay — fully blocked networks (some
- * office/school firewalls) cannot connect and surface a friendly error.
- */
-const ICE_SERVERS: RTCIceServer[] = [
-  { urls: 'stun:stun.l.google.com:19302' },
-  { urls: 'stun:stun1.l.google.com:19302' },
-  { urls: 'stun:stun2.l.google.com:19302' },
-  { urls: 'stun:stun3.l.google.com:19302' },
-  { urls: 'stun:stun.cloudflare.com:3478' },
-  { urls: 'stun:global.stun.twilio.com:3478' },
-]
-
-const PEER_OPTIONS = { config: { iceServers: ICE_SERVERS } }
-
+// Preserve PeerJS's bundled STUN and TURN defaults for cross-network relay.
+export const CONNECTION_TIMEOUT_MS = 25000
 export type HostHandlers = {
   onWaiting(): void
   onIdTaken(): void
@@ -30,125 +11,147 @@ export type HostHandlers = {
   onGuestLeft(): void
   onError(kind: 'network'): void
 }
-
 export class HostRoom {
   private peer: Peer | null = null
   private conn: DataConnection | null = null
-
+  private timer: ReturnType<typeof setTimeout> | undefined
+  private guestTimer: ReturnType<typeof setTimeout> | undefined
   start(code: string, h: HostHandlers): void {
     this.close()
-    const peer = new Peer(ROOM_PREFIX + code, PEER_OPTIONS)
+    const peer = new Peer(ROOM_PREFIX + code)
     this.peer = peer
-
-    peer.on('open', () => h.onWaiting())
-
+    const current = () => this.peer === peer
+    this.timer = setTimeout(() => {
+      if (!current()) return
+      this.close()
+      h.onError('network')
+    }, CONNECTION_TIMEOUT_MS)
+    peer.on('open', () => {
+      if (!current()) return
+      clearTimeout(this.timer)
+      h.onWaiting()
+    })
     peer.on('connection', (conn) => {
-      if (this.conn && this.conn.open) {
-        // One duel per room: tell the second arrival it is full.
+      if (!current()) { conn.close(); return }
+      // Reserve the seat during negotiation as well as after open.
+      if (this.conn) {
+        const timer = setTimeout(() => conn.close(), CONNECTION_TIMEOUT_MS)
         conn.on('open', () => {
           conn.send({ t: 'full' } satisfies HostMsg)
+          clearTimeout(timer)
           setTimeout(() => conn.close(), 300)
         })
+        conn.on('close', () => clearTimeout(timer))
         return
       }
       this.conn = conn
+      let greeted = false
+      const active = () => current() && this.conn === conn
+      const left = () => {
+        if (!active()) return
+        this.conn = null
+        clearTimeout(this.guestTimer)
+        conn.close()
+        if (greeted) h.onGuestLeft()
+        else h.onWaiting()
+      }
+      this.guestTimer = setTimeout(left, CONNECTION_TIMEOUT_MS)
       conn.on('data', (raw) => {
+        if (!active() || !raw || typeof raw !== 'object') return
         const msg = raw as ClientMsg
-        if (!msg || typeof msg !== 'object') return
-        if (msg.t === 'hello') h.onGuestHello(String(msg.name ?? ''), (m) => conn.send(m))
-        else h.onGuestMsg(msg)
+        if (msg.t === 'hello' && !greeted && typeof msg.name === 'string') {
+          greeted = true
+          clearTimeout(this.guestTimer)
+          h.onGuestHello(msg.name, (m) => { if (active()) conn.send(m) })
+        } else if (greeted && (msg.t === 'rematch' ||
+          ((msg.t === 'lock' || msg.t === 'guess') &&
+            (typeof msg.value === 'string' || typeof msg.value === 'number')))) h.onGuestMsg(msg)
       })
-      const left = () => h.onGuestLeft()
       conn.on('close', left)
       conn.on('error', left)
     })
-
     peer.on('error', (err) => {
+      if (!current()) return
+      this.close()
       if (err.type === 'unavailable-id') h.onIdTaken()
-      else if (err.type !== 'peer-unavailable') h.onError('network')
+      else h.onError('network')
     })
   }
-
-  send(msg: HostMsg): void {
-    if (this.conn && this.conn.open) this.conn.send(msg)
-  }
-
+  send(msg: HostMsg): void { if (this.conn?.open) this.conn.send(msg) }
   close(): void {
-    try {
-      this.conn?.close()
-    } catch {
-      /* already gone */
-    }
-    try {
-      this.peer?.destroy()
-    } catch {
-      /* already gone */
-    }
+    clearTimeout(this.timer)
+    clearTimeout(this.guestTimer)
+    const conn = this.conn
+    const peer = this.peer
     this.conn = null
     this.peer = null
+    try { conn?.close() } catch { /* already closed */ }
+    try { peer?.destroy() } catch { /* already closed */ }
   }
 }
-
 export type GuestHandlers = {
   onConnected(): void
   onWelcome(msg: Extract<HostMsg, { t: 'welcome' }>): void
   onView(msg: Extract<HostMsg, { t: 'view' }>): void
   onRoomFull(): void
   onHostLeft(): void
-  onError(kind: 'not-found' | 'network' | 'incompatible'): void
+  onError(kind: 'not-found' | 'network' | 'incompatible' | 'timeout'): void
 }
-
 export class GuestConnection {
   private peer: Peer | null = null
   private conn: DataConnection | null = null
-
+  private timer: ReturnType<typeof setTimeout> | undefined
   join(code: string, h: GuestHandlers): void {
     this.close()
-    const peer = new Peer(PEER_OPTIONS)
+    const peer = new Peer()
     this.peer = peer
-
+    const current = () => this.peer === peer
+    const fail = (kind: Parameters<GuestHandlers['onError']>[0]) => {
+      if (!current()) return
+      this.close()
+      h.onError(kind)
+    }
+    // Bound broker lookup, ICE negotiation, and application welcome together.
+    this.timer = setTimeout(() => fail('timeout'), CONNECTION_TIMEOUT_MS)
     peer.on('error', (err) => {
-      if (err.type === 'peer-unavailable') h.onError('not-found')
-      else if (err.type === 'browser-incompatible') h.onError('incompatible')
-      else h.onError('network')
+      fail(err.type === 'peer-unavailable' ? 'not-found' :
+        err.type === 'browser-incompatible' ? 'incompatible' : 'network')
     })
-
     peer.on('open', () => {
+      if (!current()) return
       const conn = peer.connect(ROOM_PREFIX + code, { reliable: true })
       this.conn = conn
-      conn.on('open', () => h.onConnected())
+      let welcomed = false
+      conn.on('open', () => { if (current()) h.onConnected() })
       conn.on('data', (raw) => {
+        if (!current() || !raw || typeof raw !== 'object') return
         const msg = raw as HostMsg
-        if (!msg || typeof msg !== 'object') return
-        if (msg.t === 'welcome') h.onWelcome(msg)
-        else if (msg.t === 'view') h.onView(msg)
-        else if (msg.t === 'full') h.onRoomFull()
+        if (msg.t === 'welcome' && !welcomed && msg.seat === 'p2' && msg.view) {
+          welcomed = true
+          clearTimeout(this.timer)
+          h.onWelcome(msg)
+        } else if (msg.t === 'view' && welcomed && msg.view) h.onView(msg)
+        else if (msg.t === 'full') { this.close(); h.onRoomFull() }
       })
-      conn.on('close', () => h.onHostLeft())
-      conn.on('error', () => h.onHostLeft())
+      const left = () => {
+        if (!current()) return
+        this.close()
+        if (welcomed) h.onHostLeft()
+        else h.onError('network')
+      }
+      conn.on('close', left)
+      conn.on('error', left)
     })
   }
-
-  sendHello(name: string): void {
-    this.conn?.send({ t: 'hello', name } satisfies ClientMsg)
-  }
-
-  send(msg: ClientMsg): void {
-    if (this.conn && this.conn.open) this.conn.send(msg)
-  }
-
+  sendHello(name: string): void { this.send({ t: 'hello', name }) }
+  send(msg: ClientMsg): void { if (this.conn?.open) this.conn.send(msg) }
   close(): void {
-    try {
-      this.conn?.close()
-    } catch {
-      /* already gone */
-    }
-    try {
-      this.peer?.destroy()
-    } catch {
-      /* already gone */
-    }
+    clearTimeout(this.timer)
+    const conn = this.conn
+    const peer = this.peer
     this.conn = null
     this.peer = null
+    try { conn?.close() } catch { /* already closed */ }
+    try { peer?.destroy() } catch { /* already closed */ }
   }
 }

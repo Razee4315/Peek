@@ -95,6 +95,7 @@ export function useOnlineGame() {
             if (msg.t === 'rematch') hostApply({ type: 'VOTE_REMATCH', seat: 'p2' })
           },
           onGuestLeft: () => {
+            room.close()
             sessionRef.current = null
             setState((s) => (s.st === 'live' ? { st: 'opponentLeft', view: s.view } : { st: 'lobby' }))
           },
@@ -114,7 +115,7 @@ export function useOnlineGame() {
     (rawCode: string, rawName: string) => {
       leave()
       const code = normalizeRoomCode(rawCode)
-      if (code.length < 4) {
+      if (code.length !== 5) {
         setState({ st: 'error', message: 'Enter the full room code your friend shared.' })
         return
       }
@@ -144,6 +145,8 @@ export function useOnlineGame() {
             message:
               kind === 'not-found'
                 ? `No room found with code ${code}. Check the code, or ask your friend to create one.`
+                : kind === 'timeout'
+                  ? 'The connection timed out. Keep the host room open and try again. A VPN or firewall may be blocking the connection.'
                 : kind === 'incompatible'
                   ? 'This browser cannot make peer connections.'
                   : 'Could not reach the room service. Check your internet and try again.',

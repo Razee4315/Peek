@@ -15,11 +15,11 @@ Not included: online rooms, accounts, bots, chat, timers, difficulty modes, ads,
 1. Player 1 and Player 2 enter optional display names. Blank names use these defaults. Duplicate names are allowed; player number always identifies the seat.
 2. Player 1 privately chooses an integer from 0 to 100 inclusive and locks it in. Player 2 then privately chooses theirs. Equal secrets are valid.
 3. Player 1 guesses first in the first round. Players alternate after every incorrect guess.
-4. A player's guess targets **the other player's secret**. Example: Player 2's secret is 76; Player 1 guesses 50; the app says **“Higher — their number is above 50.”**
+4. A player's guess targets **the other player's secret**. Example: Player 2's secret is 76; Player 1 guesses 50; the app says **“Higher, their number is above 50.”**
 5. A higher hint means target > guess; a lower hint means target < guess. Bounds exclude the attempted value: after 50 → higher, remaining range starts at 51.
 6. Show the current guesser only their own previous attempts and remaining possible range. That range starts at 0–100 for each player independently.
 7. A correct guess ends the round immediately. No additional turn or draw. This intentionally favors the starter slightly; alternate the starting seat each round.
-8. Incorrect feedback stays visible until the current player taps “Pass to [name].” This opens the opaque handoff screen. The recipient taps “I'm [name] — ready” before seeing their turn.
+8. Incorrect feedback stays visible until the current player taps “Pass to [name].” This opens the opaque handoff screen. The recipient taps “I'm [name], ready” before seeing their turn.
 9. The winner receives one point in this in-memory session. Results reveal both secrets and both attempt counts. Rematch requires both players to choose fresh secrets; either may reuse a previous value.
 10. “New game” resets names, score, and starter to Player 1, after confirmation when abandoning an active session. Rematch preserves names and score.
 

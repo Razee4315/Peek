@@ -1,6 +1,6 @@
 # Implementation plan
 
-**Current phase: implementation complete.** Phases 1–4 are done and continuously verified (Vitest suite in `tests/`, deployed to GitHub Pages). Phase 5 (online) was pulled forward at the user's request: rooms run peer-to-peer over WebRTC with the host's browser acting as the authoritative match engine — see README.md. The bounded checks below were executed during implementation and any deviations (a Bulls & Cows second mode, parallel online secret setup without shared-device handoffs, rematch votes in online play) are reflected in the shipped code and README.
+**Current phase: implementation complete.** Phases 1–4 are done and continuously verified (Vitest suite in `tests/`, deployed to GitHub Pages). Phase 5 (online) was pulled forward at the user's request: rooms run peer-to-peer over WebRTC with the host's browser acting as the authoritative match engine, see README.md. The bounded checks below were executed during implementation and any deviations (a Bulls & Cows second mode, parallel online secret setup without shared-device handoffs, rematch votes in online play) are reflected in the shipped code and README.
 
 ## 1. Playable local loop
 

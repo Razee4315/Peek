@@ -16,7 +16,7 @@ export function parseNumber0to100(raw: string): ParseResult {
   return { ok: true, value }
 }
 
-/** 4 digits, all different. A leading zero is fine — it is a code, not a quantity. */
+/** 4 digits, all different. A leading zero is fine, it is a code, not a quantity. */
 export function parseCode4(raw: string): ParseResult {
   const text = raw.trim()
   if (text === '') return { ok: false, error: 'Enter 4 digits.' }
@@ -53,7 +53,7 @@ export function remainingRange(guesses: { value: SecretValue; hint: { kind: stri
 
 export function rangeError(range: [number, number]): string {
   const [lo, hi] = range
-  if (lo === hi) return `It has to be ${lo} — the only number left.`
+  if (lo === hi) return `It has to be ${lo}, the only number left.`
   return `Not in your range. You know it is between ${lo} and ${hi}.`
 }
 

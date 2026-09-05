@@ -1,4 +1,4 @@
-/* Peek — paper & leaf design system (docs/design-tokens.json) */
+/* Peek, paper & leaf design system (docs/design-tokens.json) */
 
 :root {
   --bg: #f7f6f2;
@@ -746,3 +746,6 @@ body {
     font-size: 32px;
   }
 }
+
+.opponent-activity { text-align: left; border-top: 1px solid var(--border, #DADFD7); padding-top: 16px; width: 100%; }
+.opponent-activity p { line-height: 1.5; }

@@ -19,14 +19,14 @@ export function HowToPlayDialog({ open, mode, onClose }: HowToPlayProps) {
               guessing the other player&rsquo;s number.
             </p>
             <p>
-              After every guess you learn <strong>higher</strong> or <strong>lower</strong> — and your
+              After every guess you learn <strong>higher</strong> or <strong>lower</strong>, and your
               possible range narrows. First correct guess wins the round and scores a point.
             </p>
           </>
         ) : (
           <>
             <p>
-              Each player secretly picks a code of <strong>4 different digits</strong> — zeros allowed,
+              Each player secretly picks a code of <strong>4 different digits</strong>, zeros allowed,
               like <span className="num">0473</span>. Take turns guessing the other player&rsquo;s code.
             </p>
             <p>

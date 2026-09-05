@@ -81,7 +81,10 @@ describe('numbers duel (local)', () => {
     s = applyCommand(s, { type: 'SUBMIT_GUESS', seat: 'p1', value: 40 })
     expect(s).toBe(before)
 
-    // the next actor (p2, even during p1's feedback phase online-style) hunts p1's secret 76
+    // Local play must pass and acknowledge before the next player can guess.
+    expect(applyCommand(s, { type: 'SUBMIT_GUESS', seat: 'p2', value: 51 })).toBe(s)
+    s = applyCommand(s, { type: 'PASS_DEVICE' })
+    s = applyCommand(s, { type: 'ACK_HANDOFF' })
     s = applyCommand(s, { type: 'SUBMIT_GUESS', seat: 'p2', value: 51 })
     expect(s.guesses.p2).toEqual([{ value: 51, hint: { kind: 'higher' } }])
 
@@ -248,5 +251,30 @@ describe('validateGuess', () => {
     expect(validateGuess(s, 'p1', 50).ok).toBe(false)
     expect(validateGuess(s, 'p1', 51).ok).toBe(false)
     expect(validateGuess(s, 'p1', 0).ok).toBe(true)
+  })
+})
+
+describe('online opponent activity', () => {
+  it('shares submitted guesses and readiness, without revealing an unguessed secret', () => {
+    let s = createSession({ mode: 'numbers', play: 'online' })
+    s = applyCommand(s, { type: 'LOCK_SECRET', seat: 'p1', value: 76 })
+    expect(selectView(s, 'p2').opponentSecretLocked).toBe(true)
+    expect(selectView(s, 'p2').revealed).toBeNull()
+    s = applyCommand(s, { type: 'LOCK_SECRET', seat: 'p2', value: 20 })
+    s = applyCommand(s, { type: 'SUBMIT_GUESS', seat: 'p1', value: 50 })
+    const view = selectView(s, 'p2')
+    expect(view.opponentGuesses).toEqual([{ value: 50, hint: { kind: 'lower' } }])
+    expect(view.yourGuesses).toEqual([])
+    expect(JSON.stringify(view)).not.toContain('76')
+    expect(applyCommand(s, { type: 'PASS_DEVICE' })).toBe(s)
+    s = applyCommand(s, { type: 'SUBMIT_GUESS', seat: 'p2', value: 76 })
+    s = applyCommand(s, { type: 'VOTE_REMATCH', seat: 'p1' })
+    s = applyCommand(s, { type: 'VOTE_REMATCH', seat: 'p2' })
+    expect(selectView(s, 'p1').opponentGuesses).toEqual([])
+  })
+  it('keeps local opponent history private', () => {
+    const s = createSession({ mode: 'numbers', play: 'local' })
+    s.guesses.p2.push({ value: 10, hint: { kind: 'higher' } })
+    expect(selectView(s, 'p1').opponentGuesses).toEqual([])
   })
 })

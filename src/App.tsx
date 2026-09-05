@@ -18,7 +18,7 @@ type Route = { r: 'home' } | { r: 'localNames' } | { r: 'localGame' } | { r: 'on
 
 export default function App() {
   const [mode, setMode] = useState<GameMode>('numbers')
-  const [route, setRoute] = useState<Route>({ r: 'home' })
+  const [route, setRoute] = useState<Route>(() => ({ r: new URLSearchParams(window.location.search).has('room') ? 'online' : 'home' }))
   const [howToOpen, setHowToOpen] = useState(false)
   const [quitOpen, setQuitOpen] = useState(false)
   const [covered, setCovered] = useState(false)
@@ -41,11 +41,15 @@ export default function App() {
   useEffect(() => {
     if (!inGame) return
     const cover = () => setCovered(true)
-    document.addEventListener('visibilitychange', () => {
+    const onVisibility = () => {
       if (document.visibilityState === 'hidden') cover()
-    })
+    }
+    document.addEventListener('visibilitychange', onVisibility)
     window.addEventListener('blur', cover)
-    return () => window.removeEventListener('blur', cover)
+    return () => {
+      window.removeEventListener('blur', cover)
+      document.removeEventListener('visibilitychange', onVisibility)
+    }
   }, [inGame])
 
   // Browser Back during a round opens the quit confirmation instead of leaving.
@@ -62,6 +66,7 @@ export default function App() {
 
   const goHome = useCallback(() => {
     setQuitOpen(false)
+    setCovered(false)
     setRoute({ r: 'home' })
   }, [])
 
@@ -74,7 +79,7 @@ export default function App() {
   const quitDialog = (
     <Dialog open={quitOpen} title="End this game?" onCloseRequest={() => setQuitOpen(false)}>
       <p className="muted dialog-body">
-        The round, secrets and score live only in memory — ending the game clears them.
+        The round, secrets and score live only in memory, ending the game clears them.
       </p>
       <div className="btn-col">
         <Btn onClick={() => setQuitOpen(false)}>Keep playing</Btn>
@@ -126,7 +131,7 @@ export default function App() {
             local.dispatch({ type: 'VOTE_REMATCH', seat: 'p1' })
             local.dispatch({ type: 'VOTE_REMATCH', seat: 'p2' })
           }}
-          onNewGame={goHome}
+          onNewGame={() => { local.quit(); goHome() }}
         />
       </div>
     )

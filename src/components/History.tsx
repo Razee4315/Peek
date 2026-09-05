@@ -16,7 +16,7 @@ function Arrow({ up }: { up: boolean }) {
   )
 }
 
-function hintWord(a: Attempt): string {
+export function hintWord(a: Attempt): string {
   if (a.hint.kind === 'higher') return 'Higher'
   if (a.hint.kind === 'lower') return 'Lower'
   if (a.hint.kind === 'bc') return `${a.hint.bulls} exact · ${a.hint.cows} close`
@@ -24,12 +24,12 @@ function hintWord(a: Attempt): string {
 }
 
 /** Expandable flat list of this player's attempts, newest first. */
-export function History({ attempts, mode }: { attempts: Attempt[]; mode: GameMode }) {
+export function History({ attempts, mode, label = 'Your guesses' }: { attempts: Attempt[]; mode: GameMode; label?: string }) {
   const [open, setOpen] = useState(false)
   return (
     <section className="history">
       <button type="button" className="history-toggle" aria-expanded={open} onClick={() => setOpen((o) => !o)}>
-        {open ? 'Hide guesses' : `Your guesses (${attempts.length})`}
+        {open ? `Hide ${label.toLowerCase()}` : `${label} (${attempts.length})`}
       </button>
       {open &&
         (attempts.length === 0 ? (

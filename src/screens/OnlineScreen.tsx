@@ -61,13 +61,15 @@ export function OnlineScreen({ mode, net, prefillCode, onExit, onRequestQuit }: 
     return (
       <div className="page">
         <CenterNote mascot title="Making your room…" sub="Finding a free code." />
+        <Btn variant="quiet" onClick={exitFresh}>Cancel</Btn>
       </div>
     )
   }
   if (state.st === 'joining') {
     return (
       <div className="page">
-        <CenterNote mascot title={`Connecting to ${state.code}…`} sub="Knocking on their door." />
+        <CenterNote mascot title={`Connecting to ${state.code}…`} sub="Connecting your devices. This can take up to 25 seconds." />
+        <Btn variant="quiet" onClick={exitFresh}>Cancel</Btn>
       </div>
     )
   }
@@ -112,9 +114,9 @@ function Lobby({ net, mode, prefillCode, onExit }: { net: Net; mode: GameMode; p
     <div className="page">
       <div className="stack">
         <div className="stack-head">
-          <p className="eyebrow">{mode === 'numbers' ? 'Number duel' : 'Code break'} · online</p>
-          <h1 className="title">Play a friend, anywhere.</h1>
-          <p className="muted">One of you opens a room; the other joins with the code.</p>
+          <p className="eyebrow">{prefillCode ? 'Private room' : mode === 'numbers' ? 'Number duel' : 'Code break'} · online</p>
+          <h1 className="title">{prefillCode ? "You are Player 2." : "Play a friend, anywhere."}</h1>
+          <p className="muted">{prefillCode ? "Choose your name, then join your friend. The host chooses the game mode." : "Enter your name to create a room or join your friend."}</p>
         </div>
 
         <div className="field">
@@ -127,18 +129,20 @@ function Lobby({ net, mode, prefillCode, onExit }: { net: Net; mode: GameMode; p
             type="text"
             maxLength={20}
             placeholder="Maya"
-            autoComplete="off"
+            autoComplete="nickname"
+            autoFocus
+            required
             value={name}
             onChange={(e) => setName(e.target.value)}
           />
         </div>
 
-        <div className="btn-col">
-          <Btn onClick={() => net.hostRoom(mode, name)}>Create a room</Btn>
-        </div>
+        {!prefillCode && <div className="btn-col">
+          <Btn onClick={() => net.hostRoom(mode, name)} disabled={!name.trim()}>Create a room</Btn>
+        </div>}
 
         <div className="divider" role="separator">
-          <span>or join one</span>
+          <span>{prefillCode ? "Your invitation" : "or join one"}</span>
         </div>
 
         <div className="join-row">
@@ -154,10 +158,10 @@ function Lobby({ net, mode, prefillCode, onExit }: { net: Net; mode: GameMode; p
             value={code}
             onChange={(e) => setCode(normalizeRoomCode(e.target.value))}
             onKeyDown={(e) => {
-              if (e.key === 'Enter' && code.length >= 4) net.joinRoom(code, name)
+              if (e.key === 'Enter' && code.length === 5 && name.trim()) net.joinRoom(code, name)
             }}
           />
-          <Btn onClick={() => net.joinRoom(code, name)} disabled={code.length < 4}>
+          <Btn onClick={() => net.joinRoom(code, name)} disabled={code.length !== 5 || !name.trim()}>
             Join
           </Btn>
         </div>
@@ -197,7 +201,7 @@ function RoomWait({ code, onExit }: { code: string; onExit: () => void }) {
         <p className="room-code" aria-label={`Room code ${code.split('').join(' ')}`}>
           {code}
         </p>
-        <p className="muted">Share the code — or the link — and the duel starts when they arrive.</p>
+        <p className="muted">Share the code, or the link, and the duel starts when they arrive.</p>
         <div className="btn-col">
           <Btn variant="secondary" onClick={() => copy('code')}>
             {copied === 'code' ? 'Copied!' : 'Copy code'}

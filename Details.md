@@ -2,7 +2,7 @@
 
 Read README.md and docs/01-product-and-rules.md through docs/06-decisions-and-online.md before building. This kickoff contains documentation and SVG brand assets only. Implementation is deferred until requested.
 
-**Status update (implementation):** the app has now been implemented per the user's follow-up request — React + TypeScript + Vite, plain CSS from the design tokens, Vitest-covered game engine, PWA shell, and online rooms via PeerJS WebRTC (host-authoritative, seat-scoped views) plus a second game mode, 4-digit Bulls & Cows. It deploys to GitHub Pages on push to main. See README.md.
+**Status update (implementation):** the app has now been implemented per the user's follow-up request, React + TypeScript + Vite, plain CSS from the design tokens, Vitest-covered game engine, PWA shell, and online rooms via PeerJS WebRTC (host-authoritative, seat-scoped views) plus a second game mode, 4-digit Bulls & Cows. It deploys to GitHub Pages on push to main. See README.md.
 
 ## Hard rules
 
