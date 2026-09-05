@@ -19,6 +19,11 @@ interface OnlineScreenProps {
 
 export function OnlineScreen({ mode, net, prefillCode, onExit, onRequestQuit }: OnlineScreenProps) {
   const { state } = net
+  // Every way out tears the connection down so the lobby starts clean next time.
+  const exitFresh = () => {
+    net.leave()
+    onExit()
+  }
 
   if (state.st === 'live') {
     return (
@@ -31,10 +36,7 @@ export function OnlineScreen({ mode, net, prefillCode, onExit, onRequestQuit }: 
           onGuess={net.guess}
           onPass={() => undefined}
           onRematch={net.rematch}
-          onNewGame={() => {
-            net.leave()
-            onExit()
-          }}
+          onNewGame={exitFresh}
         />
       </div>
     )
@@ -48,13 +50,13 @@ export function OnlineScreen({ mode, net, prefillCode, onExit, onRequestQuit }: 
           <Mascot size={80} />
           <h1 className="title">{name} left the room.</h1>
           <p className="muted">The connection closed, so this round is over.</p>
-          <Btn onClick={onExit}>Back to start</Btn>
+          <Btn onClick={exitFresh}>Back to start</Btn>
         </div>
       </div>
     )
   }
 
-  if (state.st === 'hosting') return <RoomWait code={state.code} onExit={onExit} />
+  if (state.st === 'hosting') return <RoomWait code={state.code} onExit={exitFresh} />
   if (state.st === 'creating') {
     return (
       <div className="page">
@@ -75,13 +77,13 @@ export function OnlineScreen({ mode, net, prefillCode, onExit, onRequestQuit }: 
         <div className="stack center">
           <h1 className="title">Connection trouble</h1>
           <p className="muted">{state.message}</p>
-          <Btn onClick={onExit}>Back</Btn>
+          <Btn onClick={exitFresh}>Back</Btn>
         </div>
       </div>
     )
   }
 
-  return <Lobby net={net} mode={mode} prefillCode={prefillCode} onExit={onExit} />
+  return <Lobby net={net} mode={mode} prefillCode={prefillCode} onExit={exitFresh} />
 }
 
 function CenterNote({
