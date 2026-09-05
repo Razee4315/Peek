@@ -576,6 +576,7 @@ body {
   font-weight: 600;
   min-width: 0;
   overflow-wrap: anywhere;
+  text-align: left;
 }
 
 .reveal-sub {
