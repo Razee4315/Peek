@@ -54,7 +54,7 @@ export function GameBoard(props: GameBoardProps) {
         />
       )
     case 'setup':
-      return <SecretEntry view={view} onLock={props.onLock} />
+      return <SecretEntry key={view.step.entrySeat} view={view} onLock={props.onLock} />
     case 'setupWaiting':
       return <SetupWaiting view={view} />
     case 'yourGuess':

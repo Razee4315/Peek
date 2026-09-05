@@ -78,16 +78,17 @@ export function applyCommand(state: Session, cmd: Command): Session {
       const secrets = { ...state.secrets, [cmd.seat]: parsed.value }
       const locked = { ...state.locked, [cmd.seat]: true }
       const allLocked = locked.p1 && locked.p2
-      return {
-        ...state,
-        secrets,
-        locked,
-        phase: allLocked
-          ? state.play === 'local'
+      let phase: Session['phase'] = { step: 'setup' }
+      if (allLocked) {
+        phase =
+          state.play === 'local'
             ? { step: 'handoff', recipient: state.startingPlayer, destination: 'guess' }
             : { step: 'guess' }
-          : { step: 'setup' },
+      } else if (state.play === 'local') {
+        // Shared device: cover the screen before the other player picks their secret.
+        phase = { step: 'handoff', recipient: other(cmd.seat), destination: 'secret' }
       }
+      return { ...state, secrets, locked, phase }
     }
 
     case 'SUBMIT_GUESS': {

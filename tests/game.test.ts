@@ -62,6 +62,8 @@ describe('numbers duel (local)', () => {
 
     s = applyCommand(s, { type: 'LOCK_SECRET', seat: 'p1', value: 76 })
     expect(s.locked).toEqual({ p1: true, p2: false })
+    expect(s.phase).toEqual({ step: 'handoff', recipient: 'p2', destination: 'secret' })
+    s = applyCommand(s, { type: 'ACK_HANDOFF' })
     s = applyCommand(s, { type: 'LOCK_SECRET', seat: 'p2', value: 20 })
     expect(s.phase).toEqual({ step: 'handoff', recipient: 'p1', destination: 'guess' })
     s = applyCommand(s, { type: 'ACK_HANDOFF' })
@@ -102,6 +104,7 @@ describe('numbers duel (local)', () => {
     for (const cmd of [
       { type: 'ACK_HANDOFF' },
       { type: 'LOCK_SECRET', seat: 'p1', value: 7 },
+      { type: 'ACK_HANDOFF' },
       { type: 'LOCK_SECRET', seat: 'p2', value: 9 },
       { type: 'ACK_HANDOFF' },
     ] as const) {
@@ -119,6 +122,7 @@ describe('numbers duel (local)', () => {
     for (const cmd of [
       { type: 'ACK_HANDOFF' },
       { type: 'LOCK_SECRET', seat: 'p1', value: 7 },
+      { type: 'ACK_HANDOFF' },
       { type: 'LOCK_SECRET', seat: 'p2', value: 9 },
       { type: 'ACK_HANDOFF' },
       { type: 'SUBMIT_GUESS', seat: 'p1', value: 9 },
@@ -143,6 +147,7 @@ describe('numbers duel (local)', () => {
     expect(s.phase.step).toBe('handoff')
     s = applyCommand(s, { type: 'ACK_HANDOFF' })
     s = applyCommand(s, { type: 'LOCK_SECRET', seat: 'p1', value: 44 })
+    s = applyCommand(s, { type: 'ACK_HANDOFF' })
     s = applyCommand(s, { type: 'LOCK_SECRET', seat: 'p2', value: 44 })
     s = applyCommand(s, { type: 'ACK_HANDOFF' })
     s = applyCommand(s, { type: 'SUBMIT_GUESS', seat: 'p1', value: 44 })
