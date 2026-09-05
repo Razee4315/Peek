@@ -14,13 +14,20 @@ export type HostHandlers = {
 }
 export class HostRoom {
   private peer: Peer | null = null
+  private preparation: AbortController | null = null
   private conn: DataConnection | null = null
   private timer: ReturnType<typeof setTimeout> | undefined
   private guestTimer: ReturnType<typeof setTimeout> | undefined
-  start(code: string, h: HostHandlers): void {
+  async start(code: string, h: HostHandlers): Promise<void> {
     this.close()
-    let options: ReturnType<typeof peerOptions>
-    try { options = peerOptions() } catch { h.onError('relay-config'); return }
+    const preparation = new AbortController()
+    this.preparation = preparation
+    let options: Awaited<ReturnType<typeof peerOptions>>
+    try { options = await peerOptions(preparation.signal) } catch {
+      if (this.preparation === preparation && !preparation.signal.aborted) h.onError('relay-config')
+      return
+    }
+    if (this.preparation !== preparation || preparation.signal.aborted) return
     const peer = new Peer(ROOM_PREFIX + code, options)
     this.peer = peer
     const current = () => this.peer === peer
@@ -82,6 +89,8 @@ export class HostRoom {
   }
   send(msg: HostMsg): void { if (this.conn?.open) this.conn.send(msg) }
   close(): void {
+    this.preparation?.abort()
+    this.preparation = null
     clearTimeout(this.timer)
     clearTimeout(this.guestTimer)
     const conn = this.conn
@@ -102,12 +111,19 @@ export type GuestHandlers = {
 }
 export class GuestConnection {
   private peer: Peer | null = null
+  private preparation: AbortController | null = null
   private conn: DataConnection | null = null
   private timer: ReturnType<typeof setTimeout> | undefined
-  join(code: string, h: GuestHandlers): void {
+  async join(code: string, h: GuestHandlers): Promise<void> {
     this.close()
-    let options: ReturnType<typeof peerOptions>
-    try { options = peerOptions() } catch { h.onError('relay-config'); return }
+    const preparation = new AbortController()
+    this.preparation = preparation
+    let options: Awaited<ReturnType<typeof peerOptions>>
+    try { options = await peerOptions(preparation.signal) } catch {
+      if (this.preparation === preparation && !preparation.signal.aborted) h.onError('relay-config')
+      return
+    }
+    if (this.preparation !== preparation || preparation.signal.aborted) return
     const peer = new Peer(options)
     this.peer = peer
     const current = () => this.peer === peer
@@ -151,6 +167,8 @@ export class GuestConnection {
   sendHello(name: string): void { this.send({ t: 'hello', name }) }
   send(msg: ClientMsg): void { if (this.conn?.open) this.conn.send(msg) }
   close(): void {
+    this.preparation?.abort()
+    this.preparation = null
     clearTimeout(this.timer)
     const conn = this.conn
     const peer = this.peer

@@ -68,7 +68,7 @@ export function OnlineScreen({ mode, net, prefillCode, onExit, onRequestQuit }: 
   if (state.st === 'joining') {
     return (
       <div className="page">
-        <CenterNote mascot title={`Connecting to ${state.code}…`} sub="Connecting your devices. This can take up to 25 seconds." />
+        <CenterNote mascot title={`Connecting to ${state.code}…`} sub="Connecting your devices. This can take up to 35 seconds." />
         <Btn variant="quiet" onClick={exitFresh}>Cancel</Btn>
       </div>
     )

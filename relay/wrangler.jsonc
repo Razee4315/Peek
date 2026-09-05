@@ -1,0 +1,12 @@
+{
+  "name": "peek-relay",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-09-05",
+  "workers_dev": true,
+  "vars": { "ALLOWED_ORIGIN": "https://razee4315.github.io" },
+  "ratelimits": [
+    { "name": "IP_LIMITER", "namespace_id": "431501", "simple": { "limit": 20, "period": 60 } },
+    { "name": "GLOBAL_LIMITER", "namespace_id": "431502", "simple": { "limit": 120, "period": 60 } }
+  ],
+  "observability": { "enabled": false }
+}

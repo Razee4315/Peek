@@ -103,7 +103,7 @@ export function useOnlineGame() {
           onError: (kind) =>
             setState({
               st: 'error',
-              message: kind === 'relay-config' ? 'The room relay is not configured correctly. The site owner needs to update it.' : 'Connection trouble. Check your internet and try again.',
+              message: kind === 'relay-config' ? 'The relay service is unavailable. Please try again shortly.' : 'Connection trouble. Check your internet and try again.',
             }),
         })
       }
@@ -145,7 +145,7 @@ export function useOnlineGame() {
             st: 'error',
             message:
               kind === 'relay-config'
-                ? 'The room relay is not configured correctly. The site owner needs to update it.'
+                ? 'The relay service is unavailable. Please try again shortly.'
                 : kind === 'not-found'
                 ? `No room found with code ${code}. Check the code, or ask your friend to create one.`
                 : kind === 'timeout'

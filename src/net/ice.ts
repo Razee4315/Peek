@@ -1,29 +1,30 @@
-/** TURN credentials are client credentials, never a provider's account/API key. */
-export function parseTurnServers(raw: string | undefined): RTCIceServer[] {
-  if (!raw?.trim()) return []
-  let servers: unknown
-  try { servers = JSON.parse(raw) } catch { throw new Error('Invalid relay configuration') }
-  if (!Array.isArray(servers) || servers.length === 0) throw new Error('Invalid relay configuration')
-  return servers.map((server) => {
-    if (!server || typeof server !== 'object') throw new Error('Invalid relay configuration')
-    const urls = typeof server.urls === 'string' ? [server.urls] : server.urls
-    if (!Array.isArray(urls) || !urls.length ||
-      !urls.every((url: unknown) => typeof url === 'string' && /^turns?:[^\s]+$/.test(url)) ||
-      typeof server.username !== 'string' || !server.username.trim() ||
-      typeof server.credential !== 'string' || !server.credential.trim()) {
-      throw new Error('Invalid relay configuration')
-    }
-    return { urls, username: server.username, credential: server.credential }
-  })
+import { parseTurnServers } from './turnServers'
+export { parseTurnServers } from './turnServers'
+
+export async function peerOptions(signal?: AbortSignal) {
+  const endpoint = import.meta.env.VITE_RELAY_URL?.trim()
+  if (!endpoint) throw new Error('Relay service is not configured')
+  const url = new URL(endpoint)
+  if (url.protocol !== 'https:' && !(url.protocol === 'http:' && url.hostname === 'localhost')) {
+    throw new Error('Relay endpoint must use HTTPS')
+  }
+  if (url.username || url.password || url.search) throw new Error('Invalid relay endpoint')
+  const controller = new AbortController()
+  const abort = () => controller.abort()
+  if (signal?.aborted) abort()
+  signal?.addEventListener('abort', abort, { once: true })
+  const timer = setTimeout(abort, 8000)
+  try {
+    const response = await fetch(url, { method: 'POST', credentials: 'omit', cache: 'no-store', signal: controller.signal })
+    if (!response.ok) throw new Error('Relay service unavailable')
+    const body = await response.json()
+    const servers = parseTurnServers(JSON.stringify(body.iceServers))
+    if (!servers.length) throw new Error('Relay service returned no servers')
+    return { config: { iceServers: [{ urls: 'stun:stun.l.google.com:19302' }, ...servers] } }
+  } finally {
+    clearTimeout(timer)
+    signal?.removeEventListener('abort', abort)
+  }
 }
 
-export function peerOptions(raw = import.meta.env.VITE_TURN_SERVERS) {
-  return { config: { iceServers: [
-    { urls: 'stun:stun.l.google.com:19302' },
-    ...parseTurnServers(raw),
-  ] } }
-}
-
-export function relayConfigured(): boolean {
-  try { return parseTurnServers(import.meta.env.VITE_TURN_SERVERS).length > 0 } catch { return false }
-}
+export function relayConfigured(): boolean { return Boolean(import.meta.env.VITE_RELAY_URL?.trim()) }
