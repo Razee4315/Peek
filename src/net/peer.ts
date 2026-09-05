@@ -1,7 +1,8 @@
 import Peer, { type DataConnection } from 'peerjs'
+import { peerOptions } from './ice'
 import { ROOM_PREFIX, type ClientMsg, type HostMsg } from './protocol'
 
-// Preserve PeerJS's bundled STUN and TURN defaults for cross-network relay.
+// Use configured TURN servers. PeerJS bundled free relays were discontinued.
 export const CONNECTION_TIMEOUT_MS = 25000
 export type HostHandlers = {
   onWaiting(): void
@@ -9,7 +10,7 @@ export type HostHandlers = {
   onGuestHello(name: string, reply: (msg: HostMsg) => void): void
   onGuestMsg(msg: ClientMsg): void
   onGuestLeft(): void
-  onError(kind: 'network'): void
+  onError(kind: 'network' | 'relay-config'): void
 }
 export class HostRoom {
   private peer: Peer | null = null
@@ -18,7 +19,9 @@ export class HostRoom {
   private guestTimer: ReturnType<typeof setTimeout> | undefined
   start(code: string, h: HostHandlers): void {
     this.close()
-    const peer = new Peer(ROOM_PREFIX + code)
+    let options: ReturnType<typeof peerOptions>
+    try { options = peerOptions() } catch { h.onError('relay-config'); return }
+    const peer = new Peer(ROOM_PREFIX + code, options)
     this.peer = peer
     const current = () => this.peer === peer
     this.timer = setTimeout(() => {
@@ -95,7 +98,7 @@ export type GuestHandlers = {
   onView(msg: Extract<HostMsg, { t: 'view' }>): void
   onRoomFull(): void
   onHostLeft(): void
-  onError(kind: 'not-found' | 'network' | 'incompatible' | 'timeout'): void
+  onError(kind: 'not-found' | 'network' | 'incompatible' | 'timeout' | 'relay-config'): void
 }
 export class GuestConnection {
   private peer: Peer | null = null
@@ -103,7 +106,9 @@ export class GuestConnection {
   private timer: ReturnType<typeof setTimeout> | undefined
   join(code: string, h: GuestHandlers): void {
     this.close()
-    const peer = new Peer()
+    let options: ReturnType<typeof peerOptions>
+    try { options = peerOptions() } catch { h.onError('relay-config'); return }
+    const peer = new Peer(options)
     this.peer = peer
     const current = () => this.peer === peer
     const fail = (kind: Parameters<GuestHandlers['onError']>[0]) => {

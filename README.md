@@ -18,7 +18,7 @@ The app is deployed with GitHub Pages: **https://razee4315.github.io/Peek/**
 
 ## How online play works
 
-GitHub Pages is static hosting, so the host browser owns the match. PeerJS handles signaling and WebRTC uses its bundled STUN and TURN defaults, including relay fallback when a direct connection cannot be established. The guest receives only a seat-scoped view, never the opponent's secret before the result. Submitted guesses and their hints are shared with both players; unsubmitted drafts remain private. Public relay availability and restrictive firewalls can still affect connections. Connecting now times out after 25 seconds with an actionable error and can be cancelled.
+GitHub Pages is static hosting, so the host browser owns the match. PeerJS handles signaling. WebRTC uses explicit STUN settings and provider TURN credentials configured through `VITE_TURN_SERVERS`. The old bundled PeerJS relays were discontinued. Without configured TURN, only direct connections are available. See [relay setup](docs/07-relay-setup.md). The guest receives only a seat-scoped view, never the opponent's secret before the result. Submitted guesses and their hints are shared with both players; unsubmitted drafts remain private. Public relay availability and restrictive firewalls can still affect connections. Connecting now times out after 25 seconds with an actionable error and can be cancelled.
 
 Invite links open directly on Player 2's name/join screen. Both players choose a name before joining or creating a room. Codes must contain all five characters.
 

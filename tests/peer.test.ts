@@ -34,11 +34,11 @@ beforeEach(() => { vi.useFakeTimers(); fake.peers.length = 0 })
 afterEach(() => { vi.clearAllTimers(); vi.useRealTimers() })
 
 describe('room transport lifecycle', () => {
-  it('preserves bundled ICE defaults for both roles', () => {
+  it('uses explicit ICE settings without the discontinued bundled TURN servers', () => {
     new HostRoom().start('ABCDE', hostHandlers())
     new GuestConnection().join('ABCDE', guestHandlers())
-    expect(fake.peers[0].args).toEqual(['peek-v2-ABCDE'])
-    expect(fake.peers[1].args).toEqual([])
+    expect(fake.peers[0].args).toEqual(['peek-v2-ABCDE', { config: { iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] } }])
+    expect(fake.peers[1].args).toEqual([{ config: { iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] } }])
   })
   it('times out a connection that never opens, and suppresses later callbacks', () => {
     const guest = new GuestConnection(), h = guestHandlers()

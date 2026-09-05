@@ -28,6 +28,8 @@ jobs:
       - name: Test game logic
         run: npm test
       - name: Build
+        env:
+          VITE_TURN_SERVERS: ${{ secrets.VITE_TURN_SERVERS }}
         run: npm run build
       - uses: actions/upload-pages-artifact@v3
         with:
