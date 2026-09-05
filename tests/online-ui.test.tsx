@@ -15,7 +15,13 @@ describe('online screen content', () => {
       const html = renderToStaticMarkup(<GameBoard view={selectView(s, 'p2')} {...actions} />)
       expect(html).toContain('Maya guessed')
       expect(html).toContain(mode === 'numbers' ? '50' : '3074')
-      expect(html).toContain(mode === 'numbers' ? 'Lower' : '1 exact · 0 close')
+      expect(html).toContain(mode === 'numbers' ? 'Lower' : '1 of 4 digits correct')
+      if (mode === 'bulls') {
+        expect(html).toContain('Position 2: 0, Correct')
+        expect(html).toContain('Position 1: 3, Not correct')
+        expect(html).not.toContain(' close')
+        expect(html).not.toContain(' exact')
+      }
       expect(html).not.toContain(mode === 'numbers' ? '>76<' : '>0473<')
     }
   })

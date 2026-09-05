@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { DigitFeedback } from './DigitFeedback'
 import type { Attempt, GameMode } from '../game/types'
 
 function Arrow({ up }: { up: boolean }) {
@@ -19,7 +20,7 @@ function Arrow({ up }: { up: boolean }) {
 export function hintWord(a: Attempt): string {
   if (a.hint.kind === 'higher') return 'Higher'
   if (a.hint.kind === 'lower') return 'Lower'
-  if (a.hint.kind === 'bc') return `${a.hint.bulls} exact · ${a.hint.cows} close`
+  if (a.hint.kind === 'digits') return `${a.hint.positions.filter(Boolean).length} of 4 digits correct`
   return 'Got it'
 }
 
@@ -40,9 +41,9 @@ export function History({ attempts, mode, label = 'Your guesses' }: { attempts: 
               const key = `${a.value}-${attempts.length - i}`
               return (
                 <li key={key} className="history-row">
-                  <span className="history-value">{a.value}</span>
-                  <span className={`history-hint${a.hint.kind === 'bc' ? ' history-hint--bc' : ''}`}>
-                    {mode !== 'bulls' && a.hint.kind !== 'bc' && a.hint.kind !== 'correct' && (
+                  {a.hint.kind === 'digits' ? <DigitFeedback attempt={a} compact /> : <span className="history-value">{a.value}</span>}
+                  <span className={`history-hint${a.hint.kind === 'digits' ? ' history-hint--bc' : ''}`}>
+                    {mode !== 'bulls' && a.hint.kind !== 'digits' && a.hint.kind !== 'correct' && (
                       <Arrow up={a.hint.kind === 'higher'} />
                     )}
                     {hintWord(a)}

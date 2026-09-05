@@ -35,3 +35,7 @@ Not included: online rooms, accounts, bots, chat, timers, difficulty modes, ads,
 ## Success criteria for the later build
 
 Two people can complete setup and a round without instruction from the developer. Correct hints, endpoints, turn ownership, score updates, privacy handoffs, and rematches behave exactly as above. A cached app can play a complete new session in airplane mode. The design works at 320 px wide and with keyboard navigation. No telemetry is needed to assess these during initial playtesting.
+
+## Code break simplification
+
+Code break retains four different digits, including leading zero. Each submitted digit is now marked Correct only when it matches the same position in the opposing secret; otherwise it is marked Not correct. No misplaced-digit count is calculated or shared. Feedback, history, and online opponent activity show the position markers. All four correct wins immediately. The online room protocol prefix is v2 so older clients cannot exchange incompatible feedback with the updated game. Both players must refresh before starting a new room.

@@ -29,14 +29,9 @@ export function validateSecret(mode: GameMode, raw: string): ParseResult {
   return mode === 'numbers' ? parseNumber0to100(raw) : parseCode4(raw)
 }
 
-export function countBullsCows(secret: string, guess: string): { bulls: number; cows: number } {
-  let bulls = 0
-  let cows = 0
-  for (let i = 0; i < 4; i++) {
-    if (guess[i] === secret[i]) bulls++
-    else if (secret.includes(guess[i])) cows++
-  }
-  return { bulls, cows }
+/** Only matching positions count. No feedback about digits in other positions. */
+export function matchCodePositions(secret: string, guess: string): boolean[] {
+  return Array.from({ length: 4 }, (_, i) => guess[i] === secret[i])
 }
 
 /** Inclusive bounds still possible for a hunter, derived from their own attempts. */

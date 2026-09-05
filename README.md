@@ -5,7 +5,7 @@ A tiny guessing duel for two. Pick a secret. Find theirs first.
 Two modes, playable **face to face on one device** or **online in a private room**, no account, no server to run:
 
 - **Number duel**, each player picks a whole number from 0–100 and races to find the other's. Every guess comes back *higher* or *lower*, and your possible range narrows with you.
-- **Code break**, classic Bulls & Cows. Each player picks a code of 4 different digits (like `0473`). Every guess reports how many digits are *exact* (right digit, right spot) and how many are *close* (right digit, wrong spot). Four exact cracks the code.
+- **Code break**, Each player picks a code of 4 different digits (like `0473`). Every guessed digit is marked **Correct** or **Not correct** for its position. Get all four positions correct to win. No misplaced-digit hints are given.
 
 First correct guess wins the round and a point; the first guesser alternates every round. Online, both players agree to a rematch before the next round starts.
 

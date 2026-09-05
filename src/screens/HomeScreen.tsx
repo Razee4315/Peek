@@ -29,7 +29,7 @@ export function HomeScreen({ mode, onModeChange, onLocalPlay, onOnlinePlay, onHo
           onChange={onModeChange}
           options={[
             { value: 'numbers', label: 'Number duel', sub: '0–100 · higher or lower' },
-            { value: 'bulls', label: 'Code break', sub: '4 digits · bulls & cows' },
+            { value: 'bulls', label: 'Code break', sub: '4 digits · find the code' },
           ]}
         />
 

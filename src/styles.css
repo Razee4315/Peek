@@ -749,3 +749,15 @@ body {
 
 .opponent-activity { text-align: left; border-top: 1px solid var(--border, #DADFD7); padding-top: 16px; width: 100%; }
 .opponent-activity p { line-height: 1.5; }
+
+/* Position feedback stays readable without relying on color. */
+.digit-feedback { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; width: 100%; margin: 16px 0; }
+.digit-result { min-width: 0; border: 1px solid var(--input-border); border-radius: 12px; background: var(--surface); padding: 14px 4px; text-align: center; color: var(--muted); }
+.digit-result--correct { border-color: var(--primary); background: var(--bg); color: var(--primary); }
+.digit-result-value { display: block; font-size: 36px; font-weight: 700; font-variant-numeric: tabular-nums; line-height: 1.2; }
+.digit-result-label { display: block; font-size: 12px; font-weight: 600; line-height: 1.4; margin-top: 8px; }
+.digit-feedback--compact { max-width: 340px; }
+.digit-feedback--compact .digit-result { padding: 8px 3px; }
+.digit-feedback--compact .digit-result-value { font-size: 24px; }
+.history-row:has(.digit-feedback) { flex-wrap: wrap; }
+@media (max-width: 360px) { .digit-feedback { gap: 4px; } .digit-result-label { font-size: 11px; } }

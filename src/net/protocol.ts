@@ -1,7 +1,7 @@
 import type { GameMode, PlayerId, SeatView, SecretValue } from '../game/types'
 
 /** Room codes map to PeerJS peer ids on the public signaling server. */
-export const ROOM_PREFIX = 'peek-v1-'
+export const ROOM_PREFIX = 'peek-v2-'
 export const CODE_ALPHABET = 'ACDEFGHJKLMNPQRSTUVWXYZ23456789'
 
 export function makeRoomCode(len = 5): string {

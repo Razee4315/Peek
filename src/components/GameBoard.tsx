@@ -4,6 +4,7 @@ import type { PlayerId, SeatView, SecretValue } from '../game/types'
 import { other } from '../game/types'
 import { Btn } from './Btn'
 import { History, hintWord } from './History'
+import { DigitFeedback } from './DigitFeedback'
 import { Mascot } from './Mascot'
 import { NumField } from './NumField'
 import { HandoffCover } from './TopBar'
@@ -228,15 +229,14 @@ function Feedback({ view, onPass }: { view: SeatView; onPass: () => void }) {
           {view.names[view.you]}&rsquo;s guess
         </p>
         <div ref={live} aria-live="polite" className="feedback-hero">
-          {last.hint.kind === 'bc' ? (
+          {last.hint.kind === 'digits' ? (
             <>
               <h1 tabIndex={-1} ref={head} className="title feedback-word">
-                {last.hint.bulls} exact · {last.hint.cows} close
+                {hintWord(last)}
               </h1>
+              <DigitFeedback attempt={last} />
               <p className="muted">
-                {last.hint.bulls === 0 && last.hint.cows === 0
-                  ? 'None of those digits are in their code.'
-                  : 'Exact = right digit, right spot. Close = right digit, wrong spot.'}
+                Correct means the digit matches this position. Try a different digit wherever it says Not correct.
               </p>
             </>
           ) : (
@@ -342,6 +342,7 @@ function OpponentActivity({ view }: { view: SeatView }) {
   return (
     <section className="opponent-activity" aria-label="Opponent activity">
       <p role="status"><strong>{name} guessed <span className="num">{last.value}</span>.</strong> {hintWord(last)}</p>
+      {last.hint.kind === 'digits' && <DigitFeedback attempt={last} compact />}
       <History attempts={attempts} mode={view.mode} label={name + "'s guesses"} />
     </section>
   )

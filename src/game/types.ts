@@ -2,7 +2,7 @@
 
 export type PlayerId = 'p1' | 'p2'
 
-/** 'numbers' = hot/cold duel on 0–100. 'bulls' = 4-digit Bulls & Cows code break. */
+/** 'numbers' = hot/cold duel on 0–100. 'bulls' = 4-digit position-matching code break. */
 export type GameMode = 'numbers' | 'bulls'
 
 /** Where the game is played. Local = two people, one device. Online = a room. */
@@ -14,7 +14,7 @@ export type SecretValue = number | string
 export type Hint =
   | { kind: 'higher' }
   | { kind: 'lower' }
-  | { kind: 'bc'; bulls: number; cows: number }
+  | { kind: 'digits'; positions: boolean[] }
   | { kind: 'correct' }
 
 export interface Attempt {

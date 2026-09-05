@@ -1,4 +1,4 @@
-import { countBullsCows, validateGuess, validateSecret } from './validate'
+import { matchCodePositions, validateGuess, validateSecret } from './validate'
 import {
   type Command,
   type GameMode,
@@ -103,8 +103,8 @@ export function applyCommand(state: Session, cmd: Command): Session {
 
       let hint
       if (state.mode === 'bulls') {
-        const bc = countBullsCows(String(secret), String(parsed.value))
-        hint = bc.bulls === 4 ? { kind: 'correct' as const } : { kind: 'bc' as const, ...bc }
+        const positions = matchCodePositions(String(secret), String(parsed.value))
+        hint = positions.every(Boolean) ? { kind: 'correct' as const } : { kind: 'digits' as const, positions }
       } else {
         const guess = parsed.value as number
         hint =

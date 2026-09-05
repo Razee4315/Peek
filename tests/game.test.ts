@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { countBullsCows, parseCode4, parseNumber0to100, remainingRange, validateGuess } from '../src/game/validate'
+import { matchCodePositions, parseCode4, parseNumber0to100, remainingRange, validateGuess } from '../src/game/validate'
 import { applyCommand, createSession, localViewSeat, nextActor, selectView } from '../src/game/engine'
 
 describe('parseNumber0to100', () => {
@@ -30,13 +30,13 @@ describe('parseCode4', () => {
   })
 })
 
-describe('countBullsCows', () => {
-  it('scores bulls, cows and the win', () => {
-    expect(countBullsCows('0473', '0473')).toEqual({ bulls: 4, cows: 0 })
-    expect(countBullsCows('0473', '0123')).toEqual({ bulls: 2, cows: 0 })
-    expect(countBullsCows('0473', '3074')).toEqual({ bulls: 1, cows: 3 })
-    expect(countBullsCows('0473', '7630')).toEqual({ bulls: 0, cows: 3 })
-    expect(countBullsCows('0473', '9812')).toEqual({ bulls: 0, cows: 0 })
+describe('matchCodePositions', () => {
+  it('marks each matching position and ignores misplaced digits', () => {
+    expect(matchCodePositions('0473', '0473')).toEqual([true, true, true, true])
+    expect(matchCodePositions('0473', '0123')).toEqual([true, false, false, true])
+    expect(matchCodePositions('0473', '3074')).toEqual([false, false, true, false])
+    expect(matchCodePositions('0473', '7630')).toEqual([false, false, false, false])
+    expect(matchCodePositions('0473', '9812')).toEqual([false, false, false, false])
   })
 })
 
@@ -195,7 +195,7 @@ describe('selectView privacy', () => {
   })
 })
 
-describe('bulls & cows duel', () => {
+describe('code break duel', () => {
   function playBulls(first = 'p1') {
     let s = createSession({ mode: 'bulls', play: 'online', startingPlayer: first })
     s = applyCommand(s, { type: 'LOCK_SECRET', seat: 'p1', value: '0473' })
@@ -203,15 +203,15 @@ describe('bulls & cows duel', () => {
     return s
   }
 
-  it('scores bulls and cows against the opposing code', () => {
+  it('marks positions against the opposing code', () => {
     let s = playBulls() // p1 secret 0473, p2 secret 9012
     s = applyCommand(s, { type: 'SUBMIT_GUESS', seat: 'p1', value: '3074' })
-    expect(s.guesses.p1).toEqual([{ value: '3074', hint: { kind: 'bc', bulls: 1, cows: 0 } }])
+    expect(s.guesses.p1).toEqual([{ value: '3074', hint: { kind: 'digits', positions: [false, true, false, false] } }])
     s = applyCommand(s, { type: 'SUBMIT_GUESS', seat: 'p2', value: '3074' })
-    expect(s.guesses.p2).toEqual([{ value: '3074', hint: { kind: 'bc', bulls: 1, cows: 3 } }])
+    expect(s.guesses.p2).toEqual([{ value: '3074', hint: { kind: 'digits', positions: [false, false, true, false] } }])
   })
 
-  it('rejects repeated digits and wins on four bulls', () => {
+  it('rejects repeated digits and wins on four correct positions', () => {
     let s = playBulls()
     const bad = applyCommand(s, { type: 'SUBMIT_GUESS', seat: 'p1', value: '1123' })
     expect(bad).toBe(s)

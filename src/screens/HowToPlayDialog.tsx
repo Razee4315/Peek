@@ -30,9 +30,9 @@ export function HowToPlayDialog({ open, mode, onClose }: HowToPlayProps) {
               like <span className="num">0473</span>. Take turns guessing the other player&rsquo;s code.
             </p>
             <p>
-              After every guess you learn how many digits are <strong>exact</strong> (right digit in the
-              right spot) and how many are <strong>close</strong> (right digit, wrong spot). Four exact
-              cracks the code and wins the round.
+              Each digit is marked <strong>Correct</strong> if it matches that position, or
+              <strong> Not correct</strong> if it does not. Keep the correct digits and try different
+              digits in the other positions. Get all four correct to win.
             </p>
           </>
         )}

@@ -37,7 +37,7 @@ describe('room transport lifecycle', () => {
   it('preserves bundled ICE defaults for both roles', () => {
     new HostRoom().start('ABCDE', hostHandlers())
     new GuestConnection().join('ABCDE', guestHandlers())
-    expect(fake.peers[0].args).toEqual(['peek-v1-ABCDE'])
+    expect(fake.peers[0].args).toEqual(['peek-v2-ABCDE'])
     expect(fake.peers[1].args).toEqual([])
   })
   it('times out a connection that never opens, and suppresses later callbacks', () => {
