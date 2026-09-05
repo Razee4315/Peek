@@ -1,0 +1,30 @@
+{
+  "name": "Peek / paper and leaf",
+  "color": {
+    "background": "#F7F6F2",
+    "surface": "#FFFFFF",
+    "ink": "#202923",
+    "muted": "#58635B",
+    "primary": "#286344",
+    "primaryHover": "#1F5036",
+    "onPrimary": "#FFFFFF",
+    "playerOne": "#A6C9A5",
+    "playerTwo": "#EDBB91",
+    "border": "#DADFD7",
+    "inputBorder": "#7B887D",
+    "focus": "#286344",
+    "error": "#A32E2E"
+  },
+  "font": {
+    "family": "system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
+    "body": { "size": 16, "lineHeight": 1.5, "weight": 400 },
+    "label": { "size": 14, "lineHeight": 1.4, "weight": 600 },
+    "title": { "size": 30, "lineHeight": 1.15, "weight": 650 },
+    "number": { "size": 64, "lineHeight": 1.05, "weight": 700 }
+  },
+  "spacing": [4, 8, 12, 16, 24, 32, 40, 48, 64],
+  "radius": { "button": 14, "input": 16, "dialog": 20 },
+  "layout": { "maxWidth": 440, "gutter": 24, "smallGutter": 16, "minTouchTarget": 48 },
+  "motion": { "durationMs": 150, "shiftPx": 6, "easing": "ease-out" },
+  "shadow": "none"
+}

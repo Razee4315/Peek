@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="176" height="64" viewBox="0 0 176 64" fill="none" role="img" aria-labelledby="title">
+  <title id="title">Peek</title>
+  <g stroke="#202923" stroke-width="7" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M12 53V13H26C45 13 45 36 26 36H12"/>
+    <path d="M53 37H79C79 19 53 19 53 38C53 54 70 57 79 47"/>
+    <path d="M92 37H118C118 19 92 19 92 38C92 54 109 57 118 47"/>
+    <path d="M133 11V53M158 26L134 42M144 36L162 53"/>
+  </g>
+</svg>
