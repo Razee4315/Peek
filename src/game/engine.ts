@@ -208,6 +208,8 @@ export function selectView(s: Session, you: PlayerId): SeatView {
       s.phase.step === 'result'
         ? { p1: s.secrets.p1 as number | string, p2: s.secrets.p2 as number | string }
         : null,
+    guessCounts:
+      s.phase.step === 'result' ? { p1: s.guesses.p1.length, p2: s.guesses.p2.length } : null,
     rematchVotes: s.rematchVotes,
   }
 }

@@ -51,7 +51,7 @@ export function remainingRange(guesses: { value: SecretValue; hint: { kind: stri
   return [lo, hi]
 }
 
-export function rangeError(guess: number, range: [number, number]): string {
+export function rangeError(range: [number, number]): string {
   const [lo, hi] = range
   if (lo === hi) return `It has to be ${lo} — the only number left.`
   return `Not in your range. You know it is between ${lo} and ${hi}.`
@@ -59,7 +59,6 @@ export function rangeError(guess: number, range: [number, number]): string {
 
 /** Guess validation against the live round state. Invalid guesses never consume a turn. */
 export function validateGuess(session: Session, seat: 'p1' | 'p2', value: SecretValue): ParseResult {
-  const opponent = seat === 'p1' ? 'p2' : 'p1'
   if (session.mode === 'bulls') {
     if (typeof value !== 'string' || !/^\d{4}$/.test(value) || new Set(value).size !== 4) {
       return { ok: false, error: 'Enter 4 different digits.' }
@@ -71,7 +70,7 @@ export function validateGuess(session: Session, seat: 'p1' | 'p2', value: Secret
   const range = remainingRange(session.guesses[seat])
   const n = parsed.value as number
   if (n < range[0] || n > range[1]) {
-    return { ok: false, error: rangeError(n, range) }
+    return { ok: false, error: rangeError(range) }
   }
   return { ok: true, value: n }
 }

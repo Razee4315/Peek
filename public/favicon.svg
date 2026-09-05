@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="192" height="160" viewBox="0 0 192 160" role="img" aria-labelledby="title">
+  <title id="title">Peek simplified mark</title>
+  <path fill="#202923" fill-rule="evenodd" d="M20 77C20 53 34 38 55 38H68C89 38 101 53 101 77V119C101 130 92 139 81 139H40C29 139 20 130 20 119ZM49 75A6 6 0 0 0 43 81V89A6 6 0 0 0 55 89V81A6 6 0 0 0 49 75ZM73 75A6 6 0 0 0 67 81V89A6 6 0 0 0 79 89V81A6 6 0 0 0 73 75Z"/>
+  <path fill="#202923" fill-rule="evenodd" d="M110 91C110 69 122 56 141 56C160 56 173 70 173 94V119C173 130 164 139 153 139H130C119 139 110 130 110 119ZM126 88A5 5 0 0 0 121 93V101A5 5 0 0 0 131 101V93A5 5 0 0 0 126 88ZM150 88A5 5 0 0 0 145 93V101A5 5 0 0 0 155 101V93A5 5 0 0 0 150 88Z"/>
+</svg>

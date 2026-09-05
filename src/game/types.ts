@@ -80,6 +80,8 @@ export interface SeatView {
   step: ScreenView
   /** result only: both secrets, revealed. */
   revealed: Record<PlayerId, SecretValue> | null
+  /** result only: attempts per seat. */
+  guessCounts: Record<PlayerId, number> | null
   rematchVotes: Record<PlayerId, boolean>
 }
 

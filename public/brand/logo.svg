@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="192" height="160" viewBox="0 0 192 160" fill="none" role="img" aria-labelledby="title desc">
+  <title id="title">Peek</title>
+  <desc id="desc">Two friendly green and apricot characters peeking at each other, with higher and lower arrows.</desc>
+  <path d="M20 77C20 53 34 38 55 38H68C89 38 101 53 101 77V119C101 130 92 139 81 139H40C29 139 20 130 20 119V77Z" fill="#A6C9A5"/>
+  <path d="M91 94C91 70 105 56 126 56H139C160 56 173 70 173 94V119C173 130 164 139 153 139H111C100 139 91 130 91 119V94Z" fill="#EDBB91"/>
+  <rect x="45" y="69" width="15" height="23" rx="7.5" fill="#FFF"/>
+  <rect x="67" y="69" width="15" height="23" rx="7.5" fill="#FFF"/>
+  <rect x="52" y="77" width="7" height="11" rx="3.5" fill="#202923"/>
+  <rect x="74" y="77" width="7" height="11" rx="3.5" fill="#202923"/>
+  <path d="M59 102Q65 108 72 102" stroke="#202923" stroke-width="3.5" stroke-linecap="round"/>
+  <rect x="111" y="87" width="15" height="23" rx="7.5" fill="#FFF"/>
+  <rect x="133" y="87" width="15" height="23" rx="7.5" fill="#FFF"/>
+  <rect x="112" y="95" width="7" height="11" rx="3.5" fill="#202923"/>
+  <rect x="134" y="95" width="7" height="11" rx="3.5" fill="#202923"/>
+  <path d="M121 119Q127 125 134 119" stroke="#202923" stroke-width="3.5" stroke-linecap="round"/>
+  <path d="M63 24V10M57 16L63 10L69 16M134 24V38M128 32L134 38L140 32" stroke="#286344" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
